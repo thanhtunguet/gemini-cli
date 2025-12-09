@@ -593,14 +593,8 @@ export class ShellExecutionService {
 
           const buffer = headlessTerminal.buffer.active;
           let newOutput: AnsiOutput;
-          const defaultFg = shellExecutionConfig.defaultFg || '';
-          const defaultBg = shellExecutionConfig.defaultBg || '';
           if (shellExecutionConfig.showColor) {
-            newOutput = serializeTerminalToObject(
-              headlessTerminal,
-              defaultFg,
-              defaultBg,
-            );
+            newOutput = serializeTerminalToObject(headlessTerminal);
           } else {
             newOutput = (serializeTerminalToObject(headlessTerminal) || []).map(
               (line) =>
@@ -995,11 +989,7 @@ export class ShellExecutionService {
     const activePty = this.activePtys.get(pid);
     if (activePty) {
       // Use serializeTerminalToObject to preserve colors and structure
-      const bufferData = serializeTerminalToObject(
-        activePty.headlessTerminal,
-        activePty.shellExecutionConfig.defaultFg || '',
-        activePty.shellExecutionConfig.defaultBg || '',
-      );
+      const bufferData = serializeTerminalToObject(activePty.headlessTerminal);
       if (bufferData && bufferData.length > 0) {
         listener({ type: 'data', chunk: bufferData });
       }
@@ -1051,11 +1041,7 @@ export class ShellExecutionService {
 
     // Force emit the new state after resize
     if (activePty) {
-      const bufferData = serializeTerminalToObject(
-        activePty.headlessTerminal,
-        activePty.shellExecutionConfig.defaultFg || '',
-        activePty.shellExecutionConfig.defaultBg || '',
-      );
+      const bufferData = serializeTerminalToObject(activePty.headlessTerminal);
       const event: ShellOutputEvent = { type: 'data', chunk: bufferData };
       const listeners = ShellExecutionService.activeListeners.get(pid);
       if (listeners) {

@@ -536,6 +536,6 @@ export const useShellCommandProcessor = (
     registerBackgroundShell,
     killBackgroundShell,
     backgroundShells,
-    lastShellOutputTime
+    lastShellOutputTime,
   };
 };

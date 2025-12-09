@@ -16,6 +16,7 @@ import type {
   ThoughtSummary,
   ToolCallRequestInfo,
   GeminiErrorEventValue,
+  ToolCallResponseInfo,
 } from '@google/gemini-cli-core';
 import {
   GeminiEventType as ServerGeminiEventType,
@@ -69,6 +70,16 @@ import path from 'node:path';
 import { useSessionStats } from '../contexts/SessionContext.js';
 import { useKeypress } from './useKeypress.js';
 import type { LoadedSettings } from '../../config/settings.js';
+
+type ToolResponseWithParts = ToolCallResponseInfo & {
+  llmContent?: PartListUnion;
+};
+
+interface ShellToolData {
+  pid?: number;
+  command?: string;
+  initialOutput?: string;
+}
 
 enum StreamProcessingStatus {
   Completed,
@@ -221,7 +232,7 @@ export const useGeminiStream = (
     backgroundShells,
     registerBackgroundShell,
     killBackgroundShell,
-    lastShellOutputTime
+    lastShellOutputTime,
   } = useShellCommandProcessor(
     addItem,
     setPendingHistoryItem,
@@ -1152,7 +1163,7 @@ export const useGeminiStream = (
         const isShell = t.request.name === 'run_shell_command';
         // Access result from the tracked tool call response
         const response = t.response as ToolResponseWithParts;
-        const data = response?.data;
+        const data = response?.data as unknown as ShellToolData;
 
         // Use data.pid or fallback to t.pid (preserved from executing state)
         const pid = data?.pid ?? (t as { pid?: number }).pid;
