@@ -20,6 +20,7 @@ import type { Config } from '../config/config.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import { SubagentInvocation } from './invocation.js';
 import type { AgentInputs } from './types.js';
+import { getVersion } from '../utils/version.js';
 
 type DelegateParams = { agent_name: string } & Record<string, unknown>;
 
@@ -169,9 +170,17 @@ class DelegateInvocation extends BaseToolInvocation<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { agent_name, ...agentArgs } = this.params;
 
+    // Inject runtime context into inputs
+    const enrichedArgs: AgentInputs = {
+      ...agentArgs,
+      cliVersion: await getVersion(),
+      activeModel: this.config.getActiveModel(),
+      today: new Date().toLocaleDateString(),
+    };
+
     // Instantiate the Subagent Loop
     const subagentInvocation = new SubagentInvocation(
-      agentArgs as AgentInputs,
+      enrichedArgs,
       definition,
       this.config,
       this.messageBus,

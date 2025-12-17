@@ -28,6 +28,7 @@ import {
   READ_FILE_TOOL_NAME,
   READ_MANY_FILES_TOOL_NAME,
   WEB_SEARCH_TOOL_NAME,
+  GET_INTERNAL_DOCS_TOOL_NAME,
 } from '../tools/tool-names.js';
 import { promptIdContext } from '../utils/promptIdContext.js';
 import {
@@ -1031,6 +1032,7 @@ Important Rules:
       READ_MANY_FILES_TOOL_NAME,
       MEMORY_TOOL_NAME,
       WEB_SEARCH_TOOL_NAME,
+      GET_INTERNAL_DOCS_TOOL_NAME,
     ]);
     for (const tool of toolRegistry.getAllTools()) {
       if (!allowlist.has(tool.name)) {

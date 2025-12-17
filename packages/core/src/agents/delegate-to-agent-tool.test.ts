@@ -14,6 +14,10 @@ import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import { MessageBusType } from '../confirmation-bus/types.js';
 import { DELEGATE_TO_AGENT_TOOL_NAME } from '../tools/tool-names.js';
 
+vi.mock('../utils/version.js', () => ({
+  getVersion: vi.fn().mockResolvedValue('1.2.3'),
+}));
+
 vi.mock('./invocation.js', () => ({
   SubagentInvocation: vi.fn().mockImplementation(() => ({
     execute: vi
@@ -46,6 +50,7 @@ describe('DelegateToAgentTool', () => {
   beforeEach(() => {
     config = {
       getDebugMode: () => false,
+      getActiveModel: () => 'test-model',
       modelConfigService: {
         registerRuntimeModelConfig: vi.fn(),
       },
@@ -94,7 +99,11 @@ describe('DelegateToAgentTool', () => {
     const result = await invocation.execute(new AbortController().signal);
     expect(result).toEqual({ content: [{ type: 'text', text: 'Success' }] });
     expect(SubagentInvocation).toHaveBeenCalledWith(
-      { arg1: 'valid' },
+      expect.objectContaining({
+        arg1: 'valid',
+        cliVersion: '1.2.3',
+        activeModel: 'test-model',
+      }),
       mockAgentDef,
       config,
       messageBus,
